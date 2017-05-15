@@ -1,12 +1,22 @@
 package com.bpedroso.challenge.usecases;
 
+import static java.time.LocalDate.now;
+import static java.util.Collections.emptyList;
+
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.bpedroso.challenge.contracts.campaignapi.MessageContextCampaign;
+import com.bpedroso.challenge.contracts.campaignapi.MessageContextUser;
+import com.bpedroso.challenge.contracts.controller.MessageUserResponse;
+import com.bpedroso.challenge.contracts.controller.ResponseContentUser;
+import com.bpedroso.challenge.contracts.controller.User;
 import com.bpedroso.challenge.gateways.CampaignGateway;
-import com.bpedroso.challenge.repository.UserRepository;
+import com.bpedroso.challenge.gateways.UserGateway;
 
 /*
  * Eu, como usuário, quero me cadastrar informando meu e-mail e o meu Time
@@ -22,32 +32,45 @@ public class UserRegistration {
 
 	private CampaignGateway campaignGateway;
 
-	private UserRepository userRepository;
+	private UserGateway userGateway;
 	
 	@Autowired
-	public UserRegistration(CampaignGateway productGateway, UserRepository userRepository) {
+	public UserRegistration(CampaignGateway productGateway, UserGateway userRepository) {
 		this.campaignGateway = productGateway;
-		this.userRepository = userRepository;
+		this.userGateway = userRepository;
 	}
-	
-//	public MessageContext find(int start, int rows, String fields, final String fieldFilter) {
-//	final Optional<SearchResponseContext> products = this.campaignGateway.listProducts(start, rows, this.apiSaasConfiguration.getQuerystring().getQ(),
-//				this.apiSaasConfiguration.getQuerystring().getWt(), this.listProductsHelper.replaceFields(fields),
-//				this.listProductsHelper.adaptFilterField(fieldFilter));
-//	
-//	if(products.isPresent()) {
-//		SearchResponseContent searchResponse = products.get().getSearchResponseContent();
-//		
-//		final List<String> codes = searchResponse.getContent().stream().map(Content::getCode)
-//				.collect(Collectors.toList());
-//		
-//		
-//	}
-//
-//	return products.map(saasResponse -> new MessageContextCampaign(null, Instant.now().toString(),
-//					this.mapper.map(saasResponse.getSearchResponseContent().getContent()),
-//					this.listProductsHelper.buildPaginationResponse(saasResponse, rows)))
-//			.orElseThrow(() -> new NoContentException(NO_CONTENT.getDescription()));
-//}
+
+	/*
+	 * 1 - dado um e-mail que já existe, informar que o cadastro já foi efetuado
+	 * 2 - caso o cliente não tenha nenhuma campanha associada, o serviço deverá enviar as novas campanhas como resposta
+	 */
+	public MessageUserResponse register(String messageId, User payLoad) {
+		final MessageUserResponse mr = new MessageUserResponse(messageId, now());
+		final ResponseContentUser mcu = new ResponseContentUser();
+
+		if(log.isDebugEnabled()) {
+			log.debug("Starting save user process {}", payLoad);
+		}
+
+		final Optional<MessageContextUser> optUser = this.userGateway.findUserByEmail(messageId, payLoad.getEmail());
+		if(optUser.isPresent()) {
+			log.info("User already exists {}", payLoad);
+			mcu.setResponseMessage("Cadastro já efetuado para este email.");
+		} else {
+			this.userGateway.save(messageId, payLoad);
+		}
+
+		userHasCampaignAssociated(messageId, optUser.get().getUser(), mcu);
+
+		return mr;
+	}
+
+	//Estou mostrando somente as campanhas do time do usuario
+	private void userHasCampaignAssociated(String messageId, User user, ResponseContentUser mcu) {
+		if(Optional.ofNullable(user.getCampagns()).orElse(emptyList()).isEmpty()) {
+			mcu.getCampaigns().addAll(this.campaignGateway.getCampaignsByTeam(messageId, user.getIdTeam())
+				.orElse(new MessageContextCampaign()).getCampaigns());
+		}
+	}
 
 }

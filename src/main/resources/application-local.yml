@@ -9,13 +9,15 @@ security:
     security:
       enabled: false
 
-api:
-  campaignapi:
-    path: /v1/campaign
-
 feign:
-  campaign:
+  campaignapi:
     name: CampaignAPI
     url: http://localhost:8081
-    
-logging.level.com.bpedroso.challenge.gateways.feign.ProductClient: FULL
+    endpoints:
+      campaign: /v1/campaign
+      user: /v1/user
+  
+  
+logging.level.com.bpedroso.challenge.gateways.feign.CampaignClient: FULL
+logging.level.com.bpedroso.challenge.gateways.feign.UserClient: FULL
+

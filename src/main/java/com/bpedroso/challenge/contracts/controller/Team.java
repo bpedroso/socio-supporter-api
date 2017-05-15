@@ -6,12 +6,9 @@ import static java.lang.String.format;
 
 import java.io.Serializable;
 
-import org.springframework.data.gemfire.mapping.Region;
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-@Region("TeamPartner")
 @JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Team implements Serializable {

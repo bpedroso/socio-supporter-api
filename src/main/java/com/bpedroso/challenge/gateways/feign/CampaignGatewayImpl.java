@@ -23,7 +23,12 @@ public class CampaignGatewayImpl implements CampaignGateway {
 
 	@Override
 	public Optional<MessageContextCampaign> getCampaigns(String messageId, int code) {
-		return ofNullable(this.campaignClient.getCampaigns(messageId, code));
+		return ofNullable(this.campaignClient.getCampaigns(messageId, code, null));
+	}
+	
+	@Override
+	public Optional<MessageContextCampaign> getCampaignsByTeam(String messageId, int idTeam) {
+		return ofNullable(this.campaignClient.getCampaigns(messageId, null, idTeam));
 	}
 
 	@Override
