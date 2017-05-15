@@ -26,7 +26,7 @@ public class User implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private int id;
+	private Integer id;
 	
 	private String fullName;
 	
@@ -39,13 +39,13 @@ public class User implements Serializable {
 	
 	private Integer idTeam;
 	
-	private List<Campaign> campagns;
+	private List<Campaign> campaigns;
 	
-	public int getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
@@ -82,17 +82,17 @@ public class User implements Serializable {
 	}
 	
 	public List<Campaign> getCampagns() {
-		return campagns;
+		return campaigns;
 	}
 
 	public void setCampagns(List<Campaign> campagns) {
-		this.campagns = campagns;
+		this.campaigns = campagns;
 	}
 
 	@Override
 	public String toString() {
 		return format("User [id=%s, fullName=%s, email=%s, birth=%s, idteam=%s, campagns=%s]", 
-				id, fullName, email, birth, idTeam, campagns);
+				id, fullName, email, birth, idTeam, campaigns);
 	}
 
 }

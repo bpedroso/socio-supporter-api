@@ -7,11 +7,11 @@ import com.bpedroso.challenge.contracts.campaignapi.MessageContextCampaign;
 
 public interface CampaignGateway {
 
-	Optional<MessageContextCampaign> getCampaigns(String messageId, int code);
+	Optional<MessageContextCampaign> getCampaigns(String messageId, Integer code);
 	
-	Optional<MessageContextCampaign> getCampaignsByTeam(String messageId, int idTeam);
+	Optional<MessageContextCampaign> getCampaignsByTeam(String messageId, Integer idTeam);
 	
-	Optional<MessageContextCampaign> deleteCampaigns(String messageId, int code);
+	Optional<MessageContextCampaign> deleteCampaigns(String messageId, Integer code);
 	
 	Optional<MessageContextCampaign> updateCampaigns(String messageId, Campaign campaign);
 

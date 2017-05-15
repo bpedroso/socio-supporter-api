@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bpedroso.challenge.contracts.controller.MessageUserResponse;
 import com.bpedroso.challenge.contracts.controller.ResponseContentUser;
 import com.bpedroso.challenge.contracts.controller.User;
+import com.bpedroso.challenge.contracts.controller.UserCampaign;
 import com.bpedroso.challenge.usecases.UserRegistration;
 
 import io.swagger.annotations.ApiImplicitParam;
@@ -56,4 +57,25 @@ public class UserController {
 		return responseEntity;
 	}
 
+	
+	@ApiImplicitParams({
+		@ApiImplicitParam(name = "messageId", value = "Message ID para rastreamento", required = false, dataType = "String", paramType = "header"),
+		@ApiImplicitParam(name = "payLoad", value = "User contract", required = false, dataType = "UserCampaign", paramType = "body") })
+@ApiResponses(value = { @ApiResponse(code = 200, message = "Success", response = MessageUserResponse.class),
+		@ApiResponse(code = 204, message = "Success", response = MessageUserResponse.class),
+		@ApiResponse(code = 500, message = "Failure", response = MessageUserResponse.class) })
+@PostMapping(consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
+public ResponseEntity<MessageUserResponse> addCampaign(@RequestHeader(value = "messageId", required = false) String messageId,
+		@RequestBody UserCampaign payLoad) {
+	ResponseEntity<MessageUserResponse> responseEntity;
+	try {
+			responseEntity = new ResponseEntity<MessageUserResponse>(this.useCaseUserRegistration
+					.addCampaigns(messageId, payLoad.getIdUser(), payLoad.getCampaignCode()), OK);
+	} catch (Exception e) {
+		LOGGER.error("Fail to response " + e.getMessage());
+		responseEntity = new ResponseEntity<MessageUserResponse>(new MessageUserResponse(messageId, now(), new ResponseContentUser(e.getMessage())),
+				INTERNAL_SERVER_ERROR);
+	}
+	return responseEntity;
+}
 }
