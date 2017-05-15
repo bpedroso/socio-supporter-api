@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: team-partner-api
+  cloud.config:
+    enabled: ${ENABLE_CONFIG_SERVER:false}
+    uri: ${CONFIG_SERVER_ADDRESS}
+    name: team-partner-api
+    username: ${CONFIG_SERVER_USERNAME}
+    password: ${CONFIG_SERVER_PASSWORD}
